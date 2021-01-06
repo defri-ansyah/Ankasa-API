@@ -6,11 +6,11 @@
 ![GitHub stars](https://img.shields.io/github/stars/defri-ansyah/Ankasa-API)
 ![GitHub forks](https://img.shields.io/github/forks/defri-ansyah/Ankasa-API)
 
-< align="center">
+<p align="center">
   <a href="https://nodejs.org/" target="blank">
     <img src="https://cdn-images-1.medium.com/max/871/1*d2zLEjERsrs1Rzk_95QU9A.png">
   </a>
-</>
+</p>
 
 ## Table of Contents
 * [Prerequiste](#Prerequiste)
