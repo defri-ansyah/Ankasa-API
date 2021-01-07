@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const {verifyAccess} = require('../middlewares/auth');
-const {fileUpload} = require('../middlewares/upload')
-const usersController = require('../controllers/usersControllers');
+const {uploadMulter} = require('../middlewares/upload');
+const usersController = require('../controllers/userControllers');
 
 router.patch('/edit-profile', verifyAccess, usersController.editProfile);
-router.patch('/update-image', verifyAccess, fileUpload, usersController.updateImage);
+router.patch('/update-image', verifyAccess, uploadMulter.single('image'), usersController.updateImage);
 router.delete('/delete-image', verifyAccess, usersController.deleteImage);
 router.get('/detail', verifyAccess, usersController.getDetail);
 // router.post('/signup', authController.createUser);
