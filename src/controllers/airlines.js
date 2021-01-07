@@ -3,6 +3,7 @@ const createError = require('http-errors')
 const response = require('../helpers/response');
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
+const pagination = require('../helpers/pagination');
 
 const controllers = {
   insertAirLines: (req, res, next) => {
@@ -20,11 +21,31 @@ const controllers = {
       return next(new createError(500, 'Looks like server having trouble'))
     });
   },
-  getAllAirLines: (req, res, next) => {
-    AirLines.findAll()
+  getAllAirLines: async (req, res, next) => {
+    const { limit = 4, page = 1, order = "DESC" } = req.query
+    const offset = (parseInt(page) - 1) * parseInt(limit)
+
+    const countData = await AirLines.findAll({
+      attributes: [[sequelize.fn('COUNT', sequelize.col('*')), 'totalData']]
+    });
+    // pagination
+    const setPagination = await pagination(limit, page, "airlines", countData[0].dataValues.totalData)
+
+    AirLines.findAll({
+      offset: parseInt(offset), limit: parseInt(limit)
+    }, {
+      order: [
+        ['name', 'DESC']
+      ]
+    })
     .then((result) => {
-      response(res, result, { status:'success', statusCode:200 }, null)
-    }).catch(() => {
+      const payload = {
+        airlines: result,
+        pagination: setPagination
+      }
+      response(res, payload, { status:'success', statusCode:200 }, null)
+    }).catch((err) => {
+      console.log('err :>> ', err);
       return next(new createError(500, 'Looks like server having trouble'))
     });
   },
