@@ -2,16 +2,14 @@ const express = require('express');
 const models = require('../models');
 
 const editProfile = (req, res) => {
-  const { email, address, phone_number, username, first_name, last_name, bod, gender } = req.body;
+  const { email, phone_number, username, city, address, post_code } = req.body;
   models.users.update({
     email,
-    address,
     phone_number,
     username,
-    first_name,
-    last_name,
-    bod,
-    gender
+    city,
+    address,
+    post_code
   },
     {
       where: {
