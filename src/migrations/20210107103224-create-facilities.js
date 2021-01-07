@@ -9,9 +9,9 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       flightRouteId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
-          model: 'Facilities',
+          model: 'FlightRoutes',
           key: 'id'
         }
       },

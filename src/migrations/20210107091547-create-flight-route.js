@@ -5,9 +5,8 @@ module.exports = {
     await queryInterface.createTable('FlightRoutes', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
       flightClass: {
         type: Sequelize.STRING,
