@@ -22,20 +22,19 @@ const controllers = {
     });
   },
   getAllAirLines: async (req, res, next) => {
-    const { limit = 4, page = 1, order = "DESC" } = req.query
+    const { limit = 4, page = 1, orderby= "name", order = "DESC" } = req.query
     const offset = (parseInt(page) - 1) * parseInt(limit)
 
     const countData = await AirLines.findAll({
       attributes: [[sequelize.fn('COUNT', sequelize.col('*')), 'totalData']]
     });
     // pagination
-    const setPagination = await pagination(limit, page, "airlines", countData[0].dataValues.totalData)
+    const setPagination = await pagination(limit, page, orderby, order, "airlines", countData[0].dataValues.totalData)
 
     AirLines.findAll({
-      offset: parseInt(offset), limit: parseInt(limit)
-    }, {
+      offset: parseInt(offset), limit: parseInt(limit),
       order: [
-        ['name', 'DESC']
+        [orderby, order]
       ]
     })
     .then((result) => {

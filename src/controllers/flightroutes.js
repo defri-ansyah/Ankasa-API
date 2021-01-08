@@ -66,15 +66,68 @@ const controllers = {
     if(checkFlightRouteId.length === 0) {
       return next(new createError(404, `flightRouteId id does not match with flightroute data`))
     }
-    
+
     FlightRoute.destroy({ where: {id: id} })
-    .then((result) => {
-      console.log('result :>> ', result);
+    .then(() => {
       response(res, 'flightroute has been deleted', { status: 'success', statusCode:200 }, null ) 
-    }).catch((err) => {
-      console.log('err :>> ', err);
+    }).catch(() => {
       return next(new createError(500, `Looks like server having trouble`))
     });
+  },
+  getAllDataFlightRoute: async (req, res, next) => {
+    const { limit = 4, page = 1, orderby="price",order = "ASC" } = req.query
+    const offset = (parseInt(page) - 1) * parseInt(limit)
+    // check total data
+    const countData = await FlightRoute.findAll({
+      attributes: [[sequelize.fn('COUNT', sequelize.col('*')), 'totalData']]
+    });
+    // pagination
+    const setPagination = await pagination(limit, page,orderby,order, "flightroute", countData[0].dataValues.totalData)
+    FlightRoute.findAll({
+      offset: parseInt(offset), limit: parseInt(limit),
+      order: [
+        [orderby, order]
+      ]
+    })
+    .then((result) => {
+      const payload = {
+        flightroute: result,
+        pagination: setPagination
+      }
+      response(res, payload, { status: 'success', statusCode:200 }, null)
+    }).catch(() => {
+      return next(new createError(500, `Looks like server having trouble`))
+    });
+  },
+  updateFlightRoutes: async(req, res, next) => {
+    const {
+      flightClass, routeFrom, routeTo, flightDuration, departureTime, timeArrived,
+      transit, direct, price, airLinesId, facility
+    } = req.body
+
+    const payload = {
+      id: id, flightClass: flightClass, routeFrom: routeFrom, routeTo: routeTo, flightDuration:flightDuration,
+      departureTime: departureTime, timeArrived: timeArrived, transit: transit,
+      direct: direct, airLinesId: airLinesId?parseInt(airLinesId): '', price: price
+    }
+  },
+  search: async(req, res, next) => {
+    const { searchby, searchValue } = req.query
+    FlightRoute.findAll(
+      {
+        where: {
+          [searchby]: {
+            [Op.like]: `${searchValue}%`
+          }
+        }
+      } 
+    )
+      .then((result) => {
+        response(res, result, { status: 'success', statusCode:200 }, null) 
+      }).catch((err) => {
+        console.log('err :>> ', err);
+        return next(new createError(500, `Looks like server having trouble`))
+      })
   }
 }
 
