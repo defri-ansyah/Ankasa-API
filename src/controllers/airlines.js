@@ -145,7 +145,7 @@ const controllers = {
   deleteAirLines: (req, res, next) => {
     const id = req.params.id   
     if (!id) {
-      return next(new createError(500, 'Id cannot be empty'))
+      return next(new createError(400, 'Id cannot be empty'))
     }
     AirLines.destroy({
       where: {

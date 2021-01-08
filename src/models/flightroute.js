@@ -22,7 +22,51 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   FlightRoute.init({
-    transit: DataTypes.INTEGER
+    flightClass: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: false
+    },
+    routeFrom: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: false
+    },
+    routeTo: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: false
+    },
+    transit: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: false
+    },
+    direct: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: false
+    },
+    price: {
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+      defaultValue: false
+    },
+    flightDuration: {
+      type: DataTypes.TIME,
+      allowNull: false,
+      defaultValue: false
+    },
+    departureTime: {
+      type: DataTypes.TIME,
+      allowNull: false,
+      defaultValue: false
+    },
+    timeArrived: {
+      type: DataTypes.TIME,
+      allowNull: false,
+      defaultValue: false
+    }
   }, {
     sequelize,
     modelName: 'FlightRoute',

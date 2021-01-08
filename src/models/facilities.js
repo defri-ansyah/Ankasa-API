@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Facilities.init({
-    flightRouteId: DataTypes.INTEGER
+    flightRouteId: DataTypes.INTEGER,
+    facility: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Facilities',

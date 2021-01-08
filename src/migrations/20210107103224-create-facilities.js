@@ -10,6 +10,7 @@ module.exports = {
       },
       flightRouteId: {
         type: Sequelize.UUID,
+        onDelete: 'CASCADE',
         references: {
           model: 'FlightRoutes',
           key: 'id'
