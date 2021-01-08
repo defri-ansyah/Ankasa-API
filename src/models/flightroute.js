@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'flightRouteId',
         as: 'Facilities'
       })
+      FlightRoute.hasMany(models.Facilities, {
+        foreignKey: 'flightRouteId',
+        as: 'selected_facility'
+      })
     }
   };
   FlightRoute.init({
