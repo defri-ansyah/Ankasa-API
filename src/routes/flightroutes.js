@@ -5,12 +5,14 @@ const {
     insertFlightRoute,
     deleteFlightRoute,
     getAllDataFlightRoute,
-    search
+    search,
+    updateFlightRoutes
 } = require('../controllers/flightroutes');
 
 router
   .get('/', getAllDataFlightRoute)
   .get('/search', search)
+  .patch('/update/:id', updateFlightRoutes)
   .post('/insert-route', insertFlightRoute)
   .delete('/delete/:id', deleteFlightRoute)
 module.exports = router

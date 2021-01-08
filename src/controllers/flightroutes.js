@@ -100,16 +100,60 @@ const controllers = {
     });
   },
   updateFlightRoutes: async(req, res, next) => {
+    const id = req.params.id   
+    if (!id) {
+      return next(new createError(400, 'Id cannot be empty'))
+    }
+
     const {
       flightClass, routeFrom, routeTo, flightDuration, departureTime, timeArrived,
-      transit, direct, price, airLinesId, facility
+      transit, direct, price, airLinesId, facility = []
     } = req.body
 
     const payload = {
-      id: id, flightClass: flightClass, routeFrom: routeFrom, routeTo: routeTo, flightDuration:flightDuration,
+      flightClass: flightClass, routeFrom: routeFrom, routeTo: routeTo, flightDuration:flightDuration,
       departureTime: departureTime, timeArrived: timeArrived, transit: transit,
       direct: direct, airLinesId: airLinesId?parseInt(airLinesId): '', price: price
     }
+    // check if payload key contain null/ ""/
+    for (let key in payload) {
+      if (payload[key] === null || payload[key]=== "") {
+        delete payload[key]
+      }
+    }
+    FlightRoute.update(
+      {
+        ...payload
+      },
+      {
+        where: {
+          id: id
+        }
+      }
+    )
+    .then(async () => {
+      const result = await Facilities.findAll({ where: { flightRouteId: id}, raw: true })
+        console.log('result :>> ', result);
+        const dataDelete = result.filter(value=> !facility.includes(value.facility))
+        if (dataDelete.length > 0) {
+          dataDelete.forEach(async(el)=> {
+            await Facilities.destroy({ where: { id: el.id } })
+          })
+        }
+      const dataUpdate = facility.forEach(async(el) => {
+        const facilityCheck = await Facilities.findOne({where: { facility: {[Op.eq]: el}, flightRouteId: id}, raw: true })
+          if (!facilityCheck) {
+              // Item not found, create a new one
+             await Facilities.create({flightRouteId:id, facility:el})
+          }
+          return el
+      })
+      console.log('daatupdate',dataUpdate)
+      response(res, 'flight route has been updated', { status: 'success', statusCode: 200 }, null)
+    }).catch((err) => {
+      console.log(' err :>> ', err);
+      return next(new createError(500, 'Looks like server having trouble'))
+    });
   },
   search: async(req, res, next) => {
     const { searchby, searchValue } = req.query
@@ -124,8 +168,7 @@ const controllers = {
     )
       .then((result) => {
         response(res, result, { status: 'success', statusCode:200 }, null) 
-      }).catch((err) => {
-        console.log('err :>> ', err);
+      }).catch(() => {
         return next(new createError(500, `Looks like server having trouble`))
       })
   }
