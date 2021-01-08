@@ -12,6 +12,7 @@ const findTicket = (req, res, next) => {
     routeFrom,
     routeTo,
     flightClass
+    //tambahin date trip filter
   }
 
   filterTransit(transit, allFilter);
@@ -28,7 +29,7 @@ const findTicket = (req, res, next) => {
 
   //sort by
   const order = sort !== null && sort !== undefined && sort !== '' ? ['price', sort] : ['createdAt', 'DESC']
-  
+
   //find all
   models.FlightRoute.findAll({
     where: allFilter,
@@ -40,7 +41,7 @@ const findTicket = (req, res, next) => {
       selectedFacility,
       selectedAirlines
     ],
-    order: [ order ]
+    order: [order]
   })
     .then((flightroute) => {
       response(res, flightroute, { status: 'success', statusCode: 200 }, null)
@@ -137,4 +138,41 @@ function filterFacility(facilities) {
   return selectedFacility;
 }
 
-module.exports = { findTicket }
+const selectTicket = (req, res, next) => {
+  const { flight_route_id, passenger_desc } = req.body
+
+  models.FlightRoute.findOne({
+    where: {
+      id: flight_route_id
+    }
+  })
+    .then((flightroute) => {
+      if (flightroute) {
+        let totalPassengers = 0
+        passenger_desc.split(new RegExp('child|adult')).forEach((item, i) => {
+          if (i < 2) {
+            totalPassengers += parseInt(item)
+          }
+        })
+        models.orders.create({
+          flight_route_id,
+          user_id: req.userId,
+          total_payment: totalPassengers * flightroute.dataValues.price,
+          status_payment: 'new order'
+        })
+        .then(() => {
+          response(res, null, { status: 'success', statusCode: 200 }, null)
+        }).catch((err) => {
+          console.log(err)
+          return next(new createError(500, `Looks like server having trouble`))
+        })
+      } else {
+        response(res, null, { status: 'flight Route Id not found', statusCode: 404 }, null)
+      }
+    }).catch((err) => {
+      console.log(err)
+      return next(new createError(500, `Looks like server having trouble`))
+    })
+}
+
+module.exports = { findTicket, selectTicket }
