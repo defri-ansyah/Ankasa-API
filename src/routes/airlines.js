@@ -8,10 +8,12 @@ const
   search,
   updateAirLines,
   updateLogo,
-  deleteAirLines
+  deleteAirLines,
+  getById
 } = require('../controllers/airlines')
 router
   .get('/', getAllAirLines)
+  .get('/get-by-id/:id', getById)
   .post('/search', search)
   .post('/insert-airlines', uploadMulter.single('logo'), insertAirLines)
   .patch('/update-airlines/:id', updateAirLines)

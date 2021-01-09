@@ -156,6 +156,18 @@ const controllers = {
     }).catch(() => {
       return next(new createError(500, 'Looks like server having trouble'))
     });
+  },
+  getById: (req, res, next) => {
+    const id = req.params.id   
+    if (!id) {
+      return next(new createError(400, 'Id cannot be empty'))
+    }
+    AirLines.findOne({ where: { id: id }, raw: true })
+    .then((result) => {
+      response(res, result, { status: 'success', statusCode:200 }, null )
+    }).catch((err) => {
+      return next(new createError(500, 'Looks like server having trouble'))
+    });
   }
 }
 
