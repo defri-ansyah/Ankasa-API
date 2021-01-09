@@ -38,7 +38,7 @@ module.exports = {
       passenger_name: {
         type: Sequelize.STRING
       },
-      passenger_nastionality: {
+      passenger_nationality: {
         type: Sequelize.STRING
       },
       passenger_desc: {

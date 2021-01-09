@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      orders.hasOne(models.FlightRoute, {
+        foreignKey: 'id',
+        sourceKey: 'flight_route_id',
+        as: 'flight_route'
+      })
     }
   };
   orders.init({
@@ -24,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     cp_email: DataTypes.STRING,
     cp_phone: DataTypes.STRING,
     passenger_name: DataTypes.STRING,
-    passenger_nastionality: DataTypes.STRING,
+    passenger_nationality: DataTypes.STRING,
     passenger_desc: DataTypes.STRING,
     total_passenger: DataTypes.INTEGER,
     is_insurance: DataTypes.BOOLEAN,

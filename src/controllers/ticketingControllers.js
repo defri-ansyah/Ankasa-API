@@ -158,14 +158,15 @@ const selectTicket = (req, res, next) => {
           flight_route_id,
           user_id: req.userId,
           total_payment: totalPassengers * flightroute.dataValues.price,
-          status_payment: 'new order'
+          status_payment: 'new order',
+          total_passenger: totalPassengers
         })
-        .then(() => {
-          response(res, null, { status: 'success', statusCode: 200 }, null)
-        }).catch((err) => {
-          console.log(err)
-          return next(new createError(500, `Looks like server having trouble`))
-        })
+          .then((order) => {
+            response(res, { order_id: order.dataValues.id }, { status: 'success', statusCode: 200 }, null)
+          }).catch((err) => {
+            console.log(err)
+            return next(new createError(500, `Looks like server having trouble`))
+          })
       } else {
         response(res, null, { status: 'flight Route Id not found', statusCode: 404 }, null)
       }
@@ -175,4 +176,75 @@ const selectTicket = (req, res, next) => {
     })
 }
 
-module.exports = { findTicket, selectTicket }
+const orderDetail = (req, res, next) => {
+  const { order_id } = req.params
+  models.orders.findOne({
+    where: {
+      id: order_id,
+      user_id: req.userId
+    },
+    include: [{
+      model: models.FlightRoute,
+      as: 'flight_route'
+    }]
+  })
+  .then((order) => {
+    if (order !== null) {
+    response(res, order, { status: 'success', statusCode: 200 }, null)
+    } else {
+      response(res, null, { status: 'order not found', statusCode: 404 }, null)
+    }
+  }).catch((err) => {
+    console.log(err)
+    return next(new createError(500, `Looks like server having trouble`))
+  })
+}
+
+const inputFlightDetail = (req, res, next) => {
+  const { order_id, cp_fullname, cp_email, cp_phone, passenger_name, passenger_nationality, is_insurance } = req.body
+  models.orders.findOne ({
+    where: {
+      id: order_id
+    }
+  })
+  .then ((orderInfo) => {
+    let totalPayment = orderInfo.dataValues.total_payment
+    if (is_insurance == 1) {
+      const insurance = 75000 * orderInfo.dataValues.total_passenger
+      totalPayment += insurance
+    }
+    models.orders.update (
+      {
+        cp_fullname,
+        cp_email,
+        cp_phone,
+        passenger_name,
+        passenger_nationality,
+        is_insurance,
+        status_payment: 'waiting for payment',
+        total_payment: totalPayment
+      },{
+      where: {
+        id: order_id,
+        user_id: req.userId
+      }
+    })
+    .then((order) => {
+      console.log(order)
+      if (order[0] === 1) {
+      response(res, null, { status: 'success', statusCode: 200 }, null)
+      } else {
+        response(res, null, { status: 'update order failed', statusCode: 404 }, null)
+      }
+    }).catch((err) => {
+      console.log(err)
+      return next(new createError(500, `Looks like server having trouble`))
+    })
+  }).catch((err) => {
+    console.log(err)
+    return next(new createError(500, `Looks like server having trouble`))
+  })
+  
+}
+
+module.exports = { findTicket, selectTicket, orderDetail, inputFlightDetail }
