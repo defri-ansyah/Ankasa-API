@@ -4,11 +4,8 @@ const {verifyAccess} = require('../middlewares/auth');
 const {uploadMulter} = require('../middlewares/upload');
 const ticketingController = require('../controllers/ticketingControllers');
 
-// router.patch('/edit-profile', verifyAccess, usersController.editProfile);
-// router.patch('/update-image', verifyAccess, uploadMulter.single('image'), usersController.updateImage);
-// router.delete('/delete-image', verifyAccess, usersController.deleteImage);
 router.get('/find', ticketingController.findTicket);
-// router.post('/signup', authController.createUser);
+router.post('/select-ticket', verifyAccess, ticketingController.selectTicket);
 // router.post('/login', authController.login);
 // router.post('/forgot-password/request', authController.reqForgotPassword);
 // router.post('/forgot-password/new-password/:token', authController.forgotPassword);
