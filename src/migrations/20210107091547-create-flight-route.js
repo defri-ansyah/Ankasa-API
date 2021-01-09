@@ -32,6 +32,14 @@ module.exports = {
         allowNull: false,
         type: Sequelize.TIME
       },
+      tripType: {
+        allowNull: false,
+        type: Sequelize.ENUM('one way', 'round trip')
+      },
+      tripDate: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
       transit: {
         allowNull: false,
         type: Sequelize.INTEGER
