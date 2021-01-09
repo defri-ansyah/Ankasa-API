@@ -70,6 +70,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TIME,
       allowNull: false,
       defaultValue: false
+    },
+    tripType: {
+      type: DataTypes.ENUM({
+        values: ['one way', 'round trip']
+      }),
+      allowNull: false,
+      defaultValue: false
+    },
+    tripDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: false 
     }
   }, {
     sequelize,

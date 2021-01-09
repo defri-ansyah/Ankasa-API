@@ -14,19 +14,23 @@ const controllers = {
 
     const {
       flightClass, routeFrom, routeTo, flightDuration, departureTime, timeArrived,
-      transit, direct, price, airLinesId, facility
+      transit, direct, price, airLinesId, facility, tripType, tripDate
     } = req.body
 
     const payload = {
       id: id, flightClass: flightClass, routeFrom: routeFrom, routeTo: routeTo, flightDuration:flightDuration,
       departureTime: departureTime, timeArrived: timeArrived, transit: transit,
-      direct: direct, airLinesId: airLinesId?parseInt(airLinesId): '', price: price
+      direct: direct, airLinesId: airLinesId?parseInt(airLinesId): '', price: price, tripType: tripType,
+      tripDate: tripDate
     }
     // check if payload key contain null/ ""/
     for (let key in payload) {
       if (payload[key] === null || payload[key]=== "") {
         return next(new createError(400, `all flight route information must be filled in`))
       }
+    }
+    if (payload.tripType!=='one way' && payload.tripType !== 'round trip') {
+      return next(new createError(404, `Invalid trip type`))  
     }
     // mapping facility ['meal', 'luggage', 'etc] to array of object [{}]
     const facilityCopy = facility.map(el=> {
@@ -80,6 +84,7 @@ const controllers = {
     // check total data
     const countData = await FlightRoute.findAll({
       attributes: [[sequelize.fn('COUNT', sequelize.col('*')), 'totalData']]
+      
     });
     // pagination
     const setPagination = await pagination(limit, page,orderby,order, "flightroute", countData[0].dataValues.totalData)
@@ -87,7 +92,12 @@ const controllers = {
       offset: parseInt(offset), limit: parseInt(limit),
       order: [
         [orderby, order]
-      ]
+      ],
+      include: [{
+        model: Facilities,
+        required: true,
+        as: 'Facilities'
+      }]
     })
     .then((result) => {
       const payload = {
@@ -107,13 +117,14 @@ const controllers = {
 
     const {
       flightClass, routeFrom, routeTo, flightDuration, departureTime, timeArrived,
-      transit, direct, price, airLinesId, facility = []
+      transit, direct, price, airLinesId, facility = [], tripType, tripDate
     } = req.body
 
     const payload = {
       flightClass: flightClass, routeFrom: routeFrom, routeTo: routeTo, flightDuration:flightDuration,
       departureTime: departureTime, timeArrived: timeArrived, transit: transit,
-      direct: direct, airLinesId: airLinesId?parseInt(airLinesId): '', price: price
+      direct: direct, airLinesId: airLinesId?parseInt(airLinesId): '', price: price, tripType: tripType,
+      tripDate: tripDate
     }
     // check if payload key contain null/ ""/
     for (let key in payload) {
@@ -148,7 +159,7 @@ const controllers = {
           }
           return el
       })
-      console.log('daatupdate',dataUpdate)
+
       response(res, 'flight route has been updated', { status: 'success', statusCode: 200 }, null)
     }).catch((err) => {
       console.log(' err :>> ', err);
@@ -171,6 +182,32 @@ const controllers = {
       }).catch(() => {
         return next(new createError(500, `Looks like server having trouble`))
       })
+  },
+  getById: async(req, res, next) => {
+    const id = req.params.id   
+    if (!id) {
+      return next(new createError(400, 'Id cannot be empty'))
+    }
+    FlightRoute.findOne(
+      {
+        include: [{
+          model: Facilities,
+          required: true,
+          where: {
+            flightRouteId: id
+          },
+          as: 'Facilities'
+        }],
+        where: {
+          id: id
+        }
+      }
+    ).then((result) => {
+      response(res, result, { status: 'success', statusCode:200 }, null)   
+    }).catch((err) => {
+      console.log('err :>> ', err);
+      return next(new createError(500, 'Looks like server having trouble'))
+    });
   }
 }
 
