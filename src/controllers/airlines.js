@@ -14,7 +14,7 @@ const controllers = {
     }
     AirLines.create({
       name: name,
-      logo: `${process.env.BASE_URL}/images/${req.file.filename}`
+      logo: `${process.env.BASE_URL}images/${req.file.filename}`
     })
     .then(() => {
       response(res, 'airlines has been added', { status: 'success', statusCode:200 }, null )
