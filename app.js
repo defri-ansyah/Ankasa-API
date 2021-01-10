@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 var cors = require('cors')
 const routes = require('./src/routes/index')
 const response = require('./src/helpers/response');
+const cron = require('node-cron');
 
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -22,6 +23,14 @@ app.use('/api', routes)
 app.use((err, req, res, next) => {
   response(res, null, { status: err.status || 'Failed', statusCode: err.statusCode || 400 }, { message: err.message })
 })
+
+const ticketingController = require('./src/controllers/ticketingControllers');
+
+cron.schedule('*/30 * * * * *', () => {
+  console.log('background process running')
+  ticketingController.confrimPayment()
+
+}).start()
 
 app.listen(PORT, () => console.log(`server is running port ${PORT}
 http://localhost:${PORT}`))
