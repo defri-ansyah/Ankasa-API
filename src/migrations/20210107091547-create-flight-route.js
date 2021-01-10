@@ -50,6 +50,7 @@ module.exports = {
       },
       airLinesId: {
         type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
         references: {
           model: 'AirLines',
           key: 'id'
@@ -70,6 +71,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('FlightRoutes');
+    await queryInterface.dropTable('flightroutes');
   }
 };

@@ -9,7 +9,7 @@ const routes = require('./src/routes/index')
 const response = require('./src/helpers/response');
 
 app.use(cors())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 
