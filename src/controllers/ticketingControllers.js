@@ -190,63 +190,108 @@ const orderDetail = (req, res, next) => {
       as: 'flight_route'
     }]
   })
-  .then((order) => {
-    if (order !== null) {
-    response(res, order, { status: 'success', statusCode: 200 }, null)
-    } else {
-      response(res, null, { status: 'order not found', statusCode: 404 }, null)
-    }
-  }).catch((err) => {
-    console.log(err)
-    return next(new createError(500, `Looks like server having trouble`))
-  })
-}
-
-const inputFlightDetail = (req, res, next) => {
-  const { order_id, cp_fullname, cp_email, cp_phone, passenger_name, passenger_nationality, is_insurance } = req.body
-  models.orders.findOne ({
-    where: {
-      id: order_id
-    }
-  })
-  .then ((orderInfo) => {
-    let totalPayment = orderInfo.dataValues.total_payment
-    if (is_insurance == 1) {
-      const insurance = 75000 * orderInfo.dataValues.total_passenger
-      totalPayment += insurance
-    }
-    models.orders.update (
-      {
-        cp_fullname,
-        cp_email,
-        cp_phone,
-        passenger_name,
-        passenger_nationality,
-        is_insurance,
-        status_payment: 'waiting for payment',
-        total_payment: totalPayment
-      },{
-      where: {
-        id: order_id,
-        user_id: req.userId
-      }
-    })
     .then((order) => {
-      console.log(order)
-      if (order[0] === 1) {
-      response(res, null, { status: 'success', statusCode: 200 }, null)
+      if (order !== null) {
+        response(res, order, { status: 'success', statusCode: 200 }, null)
       } else {
-        response(res, null, { status: 'update order failed', statusCode: 404 }, null)
+        response(res, null, { status: 'order not found', statusCode: 404 }, null)
       }
     }).catch((err) => {
       console.log(err)
       return next(new createError(500, `Looks like server having trouble`))
     })
-  }).catch((err) => {
-    console.log(err)
-    return next(new createError(500, `Looks like server having trouble`))
-  })
-  
 }
 
-module.exports = { findTicket, selectTicket, orderDetail, inputFlightDetail }
+const inputFlightDetail = (req, res, next) => {
+  const { order_id, cp_fullname, cp_email, cp_phone, passenger_name, passenger_nationality, is_insurance } = req.body
+  models.orders.findOne({
+    where: {
+      id: order_id
+    }
+  })
+    .then((orderInfo) => {
+      let totalPayment = orderInfo.dataValues.total_payment
+      if (is_insurance == 1) {
+        const insurance = 75000 * orderInfo.dataValues.total_passenger
+        totalPayment += insurance
+      }
+      models.orders.update(
+        {
+          cp_fullname,
+          cp_email,
+          cp_phone,
+          passenger_name,
+          passenger_nationality,
+          is_insurance,
+          status_payment: 'Waiting for payment',
+          total_payment: totalPayment
+        }, {
+        where: {
+          id: order_id,
+          user_id: req.userId
+        }
+      })
+        .then((order) => {
+          console.log(order)
+          if (order[0] === 1) {
+            response(res, null, { status: 'success', statusCode: 200 }, null)
+          } else {
+            response(res, null, { status: 'update order failed', statusCode: 404 }, null)
+          }
+        }).catch((err) => {
+          console.log(err)
+          return next(new createError(500, `Looks like server having trouble`))
+        })
+    }).catch((err) => {
+      console.log(err)
+      return next(new createError(500, `Looks like server having trouble`))
+    })
+
+}
+
+const confrimPayment = () => {
+  const terminals = ['A', 'B', 'C', 'D', 'E']
+  console.log('Start confrim payment background process')
+  models.orders.findAll({
+    where: {
+      status_payment: 'Waiting for payment'
+    }
+  })
+    .then((orders) => {
+      orders.forEach((order) => {
+        // midtrans cek if midtran success ?
+        const isMidtransSuccess = true
+        if (isMidtransSuccess) {
+        const terminal = terminals[Math.floor(Math.random() * terminals.length)];
+        const gate = Math.floor((Math.random() * 200) + 100).toString()
+        const bookingCode = `${terminal}-${gate}`
+        models.orders.update(
+          {
+            booking_code: bookingCode,
+            terminal,
+            gate,
+            status_payment: 'Eticket issued'
+          }, {
+          where: {
+            id: order.dataValues.id,
+          }
+        })
+          .then((isSuccess) => {
+            console.log(isSuccess)
+            if (isSuccess[0] === 1) {
+              console.log(`order : ${order.dataValues.id} payment succes`)
+            } else {
+              console.log(`order : ${order.dataValues.id} payment failed`)
+            }
+            console.log('Finish confrim payment background process')
+          }).catch((err) => {
+            console.log(err)
+          })
+        }
+      })
+    }).catch((err) => {
+      console.log(err)
+    })
+}
+
+module.exports = { findTicket, selectTicket, orderDetail, inputFlightDetail, confrimPayment }
