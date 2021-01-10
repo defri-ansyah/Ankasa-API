@@ -40,6 +40,22 @@ const findTicket = (req, res, next) => {
         model: models.Facilities,
         as: 'Facilities'
       },
+      {
+        model: models.cities,
+        as: 'city_from',
+        include: [{
+          model: models.countries,
+          as: 'country'
+        }]
+      },
+      {
+        model: models.cities,
+        as: 'city_to',
+        include: [{
+          model: models.countries,
+          as: 'country'
+        }]
+      },
       selectedFacility,
       selectedAirlines
     ],

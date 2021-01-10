@@ -23,6 +23,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'flightRouteId',
         as: 'selected_facility'
       })
+      FlightRoute.hasOne(models.cities, {
+        foreignKey: 'city_name',
+        sourceKey: 'routeFrom',
+        as: 'city_from'
+      })
+      FlightRoute.hasOne(models.cities, {
+        foreignKey: 'city_name',
+        sourceKey: 'routeTo',
+        as: 'city_to'
+      })
     }
   };
   FlightRoute.init({
