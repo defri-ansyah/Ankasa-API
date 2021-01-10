@@ -4,15 +4,17 @@ const createError = require('http-errors');
 const { Sequelize } = require('../models');
 const response = require('../helpers/response');
 const Op = Sequelize.Op
+const moment = require('moment')
 
 const findTicket = (req, res, next) => {
-  const { routeFrom, routeTo, flightClass, transit, facilities, departureTime, timeArrived, airline, price, sort } = req.query
-  console.log(routeFrom, routeTo, flightClass)
+  const { routeFrom, routeTo, flightClass, tripType, tripDate, transit, facilities, departureTime, timeArrived, airline, price, sort } = req.query
+  console.log(routeFrom, routeTo, flightClass, tripType, new Date(tripDate))
   const allFilter = {
     routeFrom,
     routeTo,
-    flightClass
-    //tambahin date trip filter
+    flightClass,
+    tripType,
+    tripDate: new Date(tripDate)
   }
 
   filterTransit(transit, allFilter);
