@@ -135,4 +135,38 @@ const getDetail = (req, res) => {
     })
 }
 
-module.exports = { editProfile, updateImage, deleteImage, getDetail }
+const myBooking = (req, res) => {
+  models.orders.findOne({
+    where: {
+      user_id: req.userId
+    },
+    include: [{
+      model: models.FlightRoute,
+      as: 'flight_route'
+    }]
+  })
+  .then((result) => {
+    if (result) {
+      res.status(200).json({
+        'status': 'OK',
+        'messages': 'berhasil get my booking',
+        'data': result
+      })
+    } else {
+      res.status(404).json({
+        'status': '404',
+        'messages': 'data not found',
+        'data': {}
+      })
+    }
+  })
+  .catch((err) => {
+    res.status(500).json({
+      'status': 'ERROR',
+      'messages': err.message,
+      'data': null,
+    })
+  })
+}
+
+module.exports = { editProfile, updateImage, deleteImage, getDetail, myBooking }

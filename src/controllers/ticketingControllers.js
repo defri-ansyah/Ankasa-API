@@ -103,10 +103,10 @@ function filterTransit(transit, allFilter) {
     case 'transit':
       allFilter.transit = 1;
       break;
-    case 'transit 2+':
+    case 'transit 2':
       allFilter.transit = { [Op.gte]: 2 };
       break;
-    case 'direct 2+':
+    case 'direct 2':
       allFilter.direct = { [Op.gte]: 2 };
       break;
   }

@@ -8,7 +8,7 @@ router.patch('/edit-profile', verifyAccess, usersController.editProfile);
 router.patch('/update-image', verifyAccess, uploadMulter.single('image'), usersController.updateImage);
 router.delete('/delete-image', verifyAccess, usersController.deleteImage);
 router.get('/detail', verifyAccess, usersController.getDetail);
-// router.post('/signup', authController.createUser);
+router.get('/my-booking', verifyAccess, usersController.myBooking);
 // router.post('/login', authController.login);
 // router.post('/forgot-password/request', authController.reqForgotPassword);
 // router.post('/forgot-password/new-password/:token', authController.forgotPassword);
