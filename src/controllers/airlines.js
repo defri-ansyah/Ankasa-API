@@ -7,6 +7,7 @@ const pagination = require('../helpers/pagination');
 
 const controllers = {
   insertAirLines: (req, res, next) => {
+    console.log('req.body :>> ', req.body)
     const { name } = req.body
     if (!name || !req.file) {
       return next(new createError(400, 'Name or Logo cannot be empty'))
@@ -142,6 +143,7 @@ const controllers = {
     });
   },
   deleteAirLines: (req, res, next) => {
+    console.log('masuk delete')
     const id = req.params.id   
     if (!id) {
       return next(new createError(400, 'Id cannot be empty'))
@@ -153,7 +155,8 @@ const controllers = {
     })
     .then(() => {
       response(res, 'airlines has been deleted', { status: 'success', statusCode:200 }, null )
-    }).catch(() => {
+    }).catch((err) => {
+      console.log('err :>> ', err);
       return next(new createError(500, 'Looks like server having trouble'))
     });
   },

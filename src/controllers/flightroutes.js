@@ -97,7 +97,10 @@ const controllers = {
         model: Facilities,
         required: true,
         as: 'Facilities'
-      }]
+      },
+    {
+      model: AirLines,
+    }]
     })
     .then((result) => {
       const payload = {

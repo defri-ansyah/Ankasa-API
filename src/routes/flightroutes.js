@@ -10,11 +10,11 @@ const {
     getById
 } = require('../controllers/flightroutes');
 
-router
-  .get('/', getAllDataFlightRoute)
-  .get('/search', search)
-  .get('/get-by-id/:id', getById)
-  .patch('/update/:id', updateFlightRoutes)
-  .post('/insert-route', insertFlightRoute)
-  .delete('/delete/:id', deleteFlightRoute)
+
+router.get('/', getAllDataFlightRoute)
+router.get('/search', search)
+router.get('/get-by-id/:id', getById)
+router.patch('/update/:id', updateFlightRoutes)
+router.post('/insert-route', insertFlightRoute)
+router.delete('/delete/:id', deleteFlightRoute)
 module.exports = router
