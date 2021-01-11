@@ -142,7 +142,10 @@ const myBooking = (req, res) => {
     },
     include: [{
       model: models.FlightRoute,
-      as: 'flight_route'
+      as: 'flight_route',
+      include: [{
+        model: models.AirLines
+      }]
     }]
   })
   .then((result) => {
