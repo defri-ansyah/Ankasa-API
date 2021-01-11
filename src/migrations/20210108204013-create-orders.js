@@ -56,6 +56,9 @@ module.exports = {
       status_payment: {
         type: Sequelize.STRING
       },
+      va_number: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

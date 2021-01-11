@@ -5,6 +5,13 @@ const { Sequelize } = require('../models');
 const response = require('../helpers/response');
 const Op = Sequelize.Op
 const moment = require('moment')
+const midtransClient = require('midtrans-client');
+const coreApi = new midtransClient.CoreApi({
+  isProduction: false,
+  serverKey: process.env.MIDTRANS_SERVER_KEY,
+  clientKey: process.env.MIDTRANS_CLIENT_KEY
+});
+
 
 const findTicket = (req, res, next) => {
   const { routeFrom, routeTo, flightClass, tripType, tripDate, transit, facilities, departureTime, timeArrived, airline, price, sort } = req.query
@@ -204,7 +211,10 @@ const orderDetail = (req, res, next) => {
     },
     include: [{
       model: models.FlightRoute,
-      as: 'flight_route'
+      as: 'flight_route',
+      include: [{
+        model: models.AirLines
+      }]
     }]
   })
     .then((order) => {
@@ -224,7 +234,20 @@ const inputFlightDetail = (req, res, next) => {
   models.orders.findOne({
     where: {
       id: order_id
-    }
+    },
+    include: [{
+      model: models.FlightRoute,
+      as: 'flight_route',
+      attributes: {
+        exclude: ['id', 'createdAt', 'updatedAt']
+      },
+      include: [{
+        model: models.AirLines,
+        attributes: {
+          exclude: ['id', 'createdAt', 'updatedAt']
+        },
+      }]
+    }]
   })
     .then((orderInfo) => {
       let totalPayment = orderInfo.dataValues.total_payment
@@ -232,32 +255,76 @@ const inputFlightDetail = (req, res, next) => {
         const insurance = 75000 * orderInfo.dataValues.total_passenger
         totalPayment += insurance
       }
-      models.orders.update(
-        {
-          cp_fullname,
-          cp_email,
-          cp_phone,
-          passenger_name,
-          passenger_nationality,
-          is_insurance,
-          status_payment: 'Waiting for payment',
-          total_payment: totalPayment
-        }, {
-        where: {
-          id: order_id,
-          user_id: req.userId
-        }
-      })
-        .then((order) => {
-          console.log(order)
-          if (order[0] === 1) {
-            response(res, null, { status: 'success', statusCode: 200 }, null)
-          } else {
-            response(res, null, { status: 'update order failed', statusCode: 404 }, null)
+      const dataOrder = orderInfo.dataValues
+      const terminals = ['A', 'B', 'C', 'D', 'E']
+      const terminal = terminals[Math.floor(Math.random() * terminals.length)];
+      const gate = Math.floor((Math.random() * 200) + 100).toString()
+      const bookingCode = `${terminal}${dataOrder.id}-${gate}`
+      const parameter = {
+        "payment_type": "bank_transfer",
+        "transaction_details": {
+          "gross_amount": dataOrder.total_payment,
+          "order_id": bookingCode
+        },
+        "customer_details": {
+          "email": dataOrder.cp_email,
+          "full_name": dataOrder.cp_full_name,
+          "passanger_name": dataOrder.passanger_name,
+          "phone": dataOrder.cp_phone,
+          "passenger_nationality": dataOrder.passenger_nationality
+        },
+        "item_details": [
+          {
+            "id": dataOrder.flight_route.dataValues.id,
+            "price": dataOrder.total_payment,
+            "quantity": 1,
+            "name": dataOrder.flight_route.dataValues.AirLine.dataValues.name + ' Tiket'
           }
-        }).catch((err) => {
-          console.log(err)
-          return next(new createError(500, `Looks like server having trouble`))
+        ],
+        "bank_transfer": {
+          "bank": "bca",
+          "va_number": "12345678901"
+        }
+      }
+      coreApi.charge(parameter)
+        .then((chargeResponse) => {
+          console.log('chargeResponse:')
+          console.log(chargeResponse)
+
+          const isMidtransSuccess = chargeResponse.status_code === '201'
+          if (isMidtransSuccess) {
+            models.orders.update(
+              {
+                va_number: chargeResponse.va_numbers[0].va_number,
+                booking_code: bookingCode,
+                terminal,
+                gate,
+                cp_fullname,
+                cp_email,
+                cp_phone,
+                passenger_name,
+                passenger_nationality,
+                is_insurance,
+                status_payment: 'Waiting for payment',
+                total_payment: totalPayment
+              }, {
+              where: {
+                id: parseInt(order_id),
+                user_id: req.userId
+              }
+            })
+              .then((order) => {
+                console.log(order)
+                if (order[0] === 1) {
+                  response(res, null, { status: 'success', statusCode: 200 }, null)
+                } else {
+                  response(res, null, { status: 'update order failed', statusCode: 404 }, null)
+                }
+              }).catch((err) => {
+                console.log(err)
+                return next(new createError(500, `Looks like server having trouble`))
+              })
+          }
         })
     }).catch((err) => {
       console.log(err)
@@ -266,45 +333,48 @@ const inputFlightDetail = (req, res, next) => {
 
 }
 
-const confrimPayment = () => {
-  const terminals = ['A', 'B', 'C', 'D', 'E']
+const confrimPayment = (coreApi) => {
   console.log('Start confrim payment background process')
   models.orders.findAll({
     where: {
       status_payment: 'Waiting for payment'
-    }
+    },
   })
     .then((orders) => {
       orders.forEach((order) => {
         // midtrans cek if midtran success ?
-        const isMidtransSuccess = true
-        if (isMidtransSuccess) {
-        const terminal = terminals[Math.floor(Math.random() * terminals.length)];
-        const gate = Math.floor((Math.random() * 200) + 100).toString()
-        const bookingCode = `${terminal}-${gate}`
-        models.orders.update(
-          {
-            booking_code: bookingCode,
-            terminal,
-            gate,
-            status_payment: 'Eticket issued'
-          }, {
-          where: {
-            id: order.dataValues.id,
-          }
-        })
-          .then((isSuccess) => {
-            console.log(isSuccess)
-            if (isSuccess[0] === 1) {
-              console.log(`order : ${order.dataValues.id} payment succes`)
+        const dataOrder = order.dataValues
+        coreApi.transaction.status(dataOrder.booking_code)
+          .then((chargeResponse) => {
+            console.log('chargeResponse:')
+            console.log(chargeResponse)
+            const isMidtransSuccess = chargeResponse.status_code === '200'
+            if (isMidtransSuccess) {
+              models.orders.update(
+                {
+                  status_payment: 'Eticket issued'
+                }, {
+                where: {
+                  id: order.dataValues.id,
+                }
+              })
+                .then((isSuccess) => {
+                  console.log(isSuccess)
+                  if (isSuccess[0] === 1) {
+                    console.log(`order : ${order.dataValues.id} payment succes`)
+                  } else {
+                    console.log(`order : ${order.dataValues.id} payment failed`)
+                  }
+                  console.log('Finish confrim payment background process')
+                }).catch((err) => {
+                  console.log(err)
+                })
             } else {
-              console.log(`order : ${order.dataValues.id} payment failed`)
+              return
             }
-            console.log('Finish confrim payment background process')
           }).catch((err) => {
             console.log(err)
           })
-        }
       })
     }).catch((err) => {
       console.log(err)
