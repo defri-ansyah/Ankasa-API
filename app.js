@@ -86,7 +86,7 @@ let parameter = {
 //     console.log(chargeResponse);
 //   });
 
-cron.schedule('* * * * *', () => {
+cron.schedule('*/5 * * * *', () => {
   console.log('background process running')
   ticketingController.confrimPayment(coreApi)
 
