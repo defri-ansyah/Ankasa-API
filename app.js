@@ -25,10 +25,70 @@ app.use((err, req, res, next) => {
 })
 
 const ticketingController = require('./src/controllers/ticketingControllers');
+const midtransClient = require('midtrans-client');
+// Create Core API instance
+const coreApi = new midtransClient.CoreApi({
+  isProduction: false,
+  serverKey: process.env.MIDTRANS_SERVER_KEY,
+  clientKey: process.env.MIDTRANS_CLIENT_KEY
+});
+
+let parameter = {
+  "payment_type": "bank_transfer",
+  "transaction_details": {
+    "gross_amount": 44000,
+    "order_id": "order-101c-{{$timestamp}}"
+  },
+  "customer_details": {
+    "email": "noreply@example.com",
+    "first_name": "budi",
+    "last_name": "utomo",
+    "phone": "+6281 1234 1234"
+  },
+  "item_details": [
+    {
+      "id": "item01",
+      "price": 21000,
+      "quantity": 1,
+      "name": "Ayam Zozozo"
+    },
+    {
+      "id": "item02",
+      "price": 23000,
+      "quantity": 1,
+      "name": "Ayam Xoxoxo"
+    }
+  ],
+  "bank_transfer": {
+    "bank": "bca",
+    "va_number": "12345678901",
+    "free_text": {
+      "inquiry": [
+        {
+          "id": "Your Custom Text in ID language",
+          "en": "Your Custom Text in EN language"
+        }
+      ],
+      "payment": [
+        {
+          "id": "Your Custom Text in ID language",
+          "en": "Your Custom Text in EN language"
+        }
+      ]
+    }
+  }
+};
+
+// charge transaction
+// coreApi.charge(parameter)
+//   .then((chargeResponse) => {
+//     console.log('chargeResponse:');
+//     console.log(chargeResponse);
+//   });
 
 cron.schedule('*/30 * * * * *', () => {
   console.log('background process running')
-  ticketingController.confrimPayment()
+  ticketingController.confrimPayment(coreApi)
 
 }).start()
 
