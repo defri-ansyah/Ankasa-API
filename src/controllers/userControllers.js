@@ -136,7 +136,7 @@ const getDetail = (req, res) => {
 }
 
 const myBooking = (req, res) => {
-  models.orders.findOne({
+  models.orders.findAll({
     where: {
       user_id: req.userId
     },

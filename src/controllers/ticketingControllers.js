@@ -177,7 +177,8 @@ const selectTicket = (req, res, next) => {
           user_id: req.userId,
           total_payment: totalPassengers * flightroute.dataValues.price,
           status_payment: 'new order',
-          total_passenger: totalPassengers
+          total_passenger: totalPassengers,
+          passenger_desc
         })
           .then((order) => {
             response(res, { order_id: order.dataValues.id }, { status: 'success', statusCode: 200 }, null)
