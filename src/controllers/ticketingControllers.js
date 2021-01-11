@@ -324,7 +324,7 @@ const inputFlightDetail = (req, res, next) => {
                 console.log(err)
                 return next(new createError(500, `Looks like server having trouble`))
               })
-          } else { return }
+          }
         })
     }).catch((err) => {
       console.log(err)
