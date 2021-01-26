@@ -171,6 +171,15 @@ const controllers = {
     }).catch((err) => {
       return next(new createError(500, 'Looks like server having trouble'))
     });
+  },
+  amountAirLines: async(req, res, next) => {
+    AirLines.count()
+    .then((result) => {
+      console.log('result :>> ', result);
+      res.json(result)
+    }).catch((err) => {
+      res.json(err)
+    });
   }
 }
 

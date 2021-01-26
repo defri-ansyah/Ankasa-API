@@ -381,4 +381,16 @@ const confrimPayment = (coreApi) => {
     })
 }
 
-module.exports = { findTicket, selectTicket, orderDetail, inputFlightDetail, confrimPayment }
+const countCompletedPaymentOrder = (req, res, next) => {
+  models.orders.count(
+    {
+      where: { status_payment: 'Eticket issued' }
+    }
+  )
+  .then((result) => {
+    response(res, result, { status: 'success', statusCode: 200 }, null)
+  }).catch(() => {
+    return next(new createError(500, 'Looks like server having trouble'))
+  });
+}
+module.exports = { findTicket, selectTicket, orderDetail, inputFlightDetail, confrimPayment, countCompletedPaymentOrder }

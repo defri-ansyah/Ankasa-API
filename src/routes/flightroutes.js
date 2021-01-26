@@ -7,7 +7,8 @@ const {
     getAllDataFlightRoute,
     search,
     updateFlightRoutes,
-    getById
+    getById,
+    amountFlightRoute
 } = require('../controllers/flightroutes');
 
 
@@ -17,4 +18,5 @@ router.get('/get-by-id/:id', getById)
 router.patch('/update/:id', updateFlightRoutes)
 router.post('/insert-route', insertFlightRoute)
 router.delete('/delete/:id', deleteFlightRoute)
+router.get('/amount', amountFlightRoute)
 module.exports = router

@@ -8,6 +8,7 @@ router.get('/find', ticketingController.findTicket);
 router.post('/select-ticket', verifyAccess, ticketingController.selectTicket);
 router.get('/detail/:order_id', verifyAccess, ticketingController.orderDetail);
 router.patch('/input-flight-detail', verifyAccess, ticketingController.inputFlightDetail);
+router.get('/amount-completed-payment',ticketingController.countCompletedPaymentOrder)
 // router.post('/forgot-password/request', authController.reqForgotPassword);
 // router.post('/forgot-password/new-password/:token', authController.forgotPassword);
 

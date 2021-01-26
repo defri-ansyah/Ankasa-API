@@ -211,6 +211,15 @@ const controllers = {
       console.log('err :>> ', err);
       return next(new createError(500, 'Looks like server having trouble'))
     });
+  },
+  amountFlightRoute: async (req, res, next) => {
+    FlightRoute.count()
+    .then((result) => {
+      console.log('result', result)
+      res.json(result)
+    }).catch((err) => {
+      res.json(err)
+    });
   }
 }
 
