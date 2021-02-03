@@ -27,8 +27,10 @@
 ## Prerequiste
 - Node.js - Download and Install [Node.js](https://nodejs.org/en/).
 - MySQL - Download and Install [MySQL](https://www.mysql.com/downloads/)
-- Sequelize - Download and Install [Sequelize](https://sequelize.org/)
+- Express.js - Download and Install [Express.js](https://expressjs.com/)
+- Sequelize.js - Download and Install [Sequelize.js](https://sequelize.org/)
 - Midtrans - Download and Install [Midtrans](https://midtrans.com/)
+- Node-cron - Download and Install [Node-cron](https://www.npmjs.com/package/node-cron)
 
 ## Installation
 ### Clone
@@ -116,8 +118,7 @@ $ npm run serve
 | 7   | POST        | /api/flightroute/search           | Search flightroutes on admin    |
 
 ## About Project
-Ankasa is a project inspired by one of Unicorn in Indonesia.
-It's API made for Ankasa using Node Js and Express Js
+Ankasa is a project inspired by one of Unicorn in Indonesia. With Ankasa Ticketing, users can search a specific flights to another countries. The App also has a Find Ticket and Filter Features that allows users to select a country as an arrival destination and explore flight prices to various regions.
 
 ## Contributing
 
