@@ -24,12 +24,11 @@
 * [Contributing](#Contributing)
 * [Contact](#Contact)
 
-
 ## Prerequiste
 - Node.js - Download and Install [Node.js](https://nodejs.org/en/).
 - MySQL - Download and Install [MySQL](https://www.mysql.com/downloads/)
-- Redis - Download and Install [Redis](https://redis.io/)
-
+- Sequelize - Download and Install [Sequelize](https://sequelize.org/)
+- Midtrans - Download and Install [Midtrans](https://midtrans.com/)
 
 ## Installation
 ### Clone
@@ -58,7 +57,7 @@ PASSWORD = YOUR_EMAIL_PASSWORD
 $ npm run serve
 ```
 ## Link Collection Postman
-[Click Here](https://www.getpostman.com/collections/b14d5faf192b7b980d32)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/f7bb3ee225804360c26a)
 
 ## API Endpoint
 ### Auth Endpoint
@@ -68,7 +67,7 @@ $ npm run serve
 | 2   | POST        | /api/auth/login                               | login user                                 |
 | 3   | POST        | /api/auth/forgot-password/request             | Request forgot password via email          |
 | 4   | POST        | /api/auth/forgot-password/new-password/:token | Forgot password                            |
-| 9   | PATCH       | /api/auth/edit-password                       | Edit password from profile user            |
+| 5   | PATCH       | /api/auth/edit-password                       | Edit password from profile user            |
 
 ### User Endpoint
 | No  | HTTP Method | URI                              | Operation                                  |
@@ -77,6 +76,44 @@ $ npm run serve
 | 2   | PATCH       | /api/user/update-image           | update image user                          |
 | 3   | DELETE      | /api/user/delete-image           | Delete image user                          |
 | 4   | GET         | /api/user/detail                 | Get detail user                            |
+| 5   | GET         | /api/user/my booking             | Get all booking user                       |
+
+### Ticketing Endpoint
+| No  | HTTP Method | URI                                     | Operation                                 |
+| --- | ----------- | --------------------------------------- | ----------------------------------------- |
+| 1   | GET         | /api/ticketing/find                     | Get find ticket                           |
+| 2   | POST        | /api/ticketing/select-ticket            | Select ticket by flight route id for order|
+| 3   | GET         | /api/ticketing/detail/:order_id         | Get order detail by order id & userid     |
+| 4   | PATCH       | /api/ticketing/input-flight-detail      | Input flight detail by order id           |
+| 5   | GET         | /api/ticketing/amount-completed-payment | Get total completed payment on admin      |
+
+### Data look-up Endpoint
+| No  | HTTP Method | URI                    | Operation               |
+| --- | ----------- | ---------------------- | ----------------------- |
+| 1   | GET         | /api/data-lookup/city  | Get city on find ticket |
+
+### Airlines Endpoint
+| No  | HTTP Method | URI                               | Operation                     |
+| --- | ----------- | --------------------------------- | ----------------------------- |
+| 1   | POST        | /api/airlines/insert-airlines     | Add new airlines on admin     |
+| 2   | DELETE      | /api/airlines/delete/:id          | Delete airlines on admin      |
+| 3   | GET         | /api/airlines                     | Get all airlines on admin     |
+| 4   | PATCH       | /api/airlines/update-airlines/:id | Update name airlines on admin |
+| 5   | GET         | /api/airlines/get-by-id/:id       | Get airlines by id on admin   |
+| 6   | GET         | /api/airlines/amount              | Get total airlines on admin   |
+| 7   | POST        | /api/airlines/search              | Search airlines on admin      |
+| 8   | PATCH       | /api/airlines/update-logo/:id     | Update logo airlines on admin |
+
+### Airlines Endpoint
+| No  | HTTP Method | URI                               | Operation                       |
+| --- | ----------- | --------------------------------- | ------------------------------- |
+| 1   | POST        | /api/flightroute/insert-route     | Insert flighroutes on admin     |
+| 2   | DELETE      | /api/flighroute/delete/:id        | Delete flightroutes on admin    |
+| 3   | GET         | /api/flighroute                   | Get all flightroutes on admin   |
+| 4   | PATCH       | /api/flightroute/update/:id       | Update flightroutes on admin    |
+| 5   | GET         | /api/flightroute/get-by-id/:id    | Get flightroutes by id on admin |
+| 6   | GET         | /api/flightroute/amount           | Get total flightroutes on admin |
+| 7   | POST        | /api/flightroute/search           | Search flightroutes on admin    |
 
 ## About Project
 Ankasa is a project inspired by one of Unicorn in Indonesia.
@@ -93,7 +130,39 @@ Fork the Project
 4. Open a Pull Request
 
 ## Related Project
-* [`Frontend Ankasa`](https://github.com/)
+* [`Frontend Ankasa`](https://github.com/ArbiNMaki/Ankasa-Frontend)
+
+## Contributors
+<center>
+  <table>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/defri-ansyah">
+          <img width="150" src="https://avatars1.githubusercontent.com/u/73015398?s=400&u=72939e4bacd74f0ad4de21d2c8e1a0bfe8f3b059&v=4" alt="Defri Ansyah"><br/>
+          <b>Defri Ansyah</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/Gefyaqiilah">
+          <img width="150" src="https://avatars.githubusercontent.com/u/54069791?s=400&u=d52c9220de7f217fab6be5eed1a2f237325ef741&v=4" alt="Gefy Aqiilah Aqshal"><br/>
+          <b>Gefy Aqiilah Aqshal</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/ArbiNMaki">
+          <img width="150" src="https://avatars.githubusercontent.com/u/26770607?s=400&u=2af4fbf7c775908919e7f8d0454e95eafee3739f&v=4" alt="Arbi Dwi WIjaya"><br/>
+          <b>Arbi Dwi WIjaya</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/safiratrisa">
+          <img width="150" src="https://avatars1.githubusercontent.com/u/41407774?s=400&v=4" alt="Trisa Safira Hasanah"><br/>
+          <b>Trisa Safira Hasanah</b>
+        </a>
+      </td>
+    </tr>
+  </table>
+</center>
 
 ---
-Copyright © 2020 [Defri Ansyah](https://github.com/defri-ansyah)
+Copyright © 2021 [Defri Ansyah](https://github.com/defri-ansyah)
