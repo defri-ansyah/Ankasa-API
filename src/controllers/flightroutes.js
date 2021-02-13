@@ -169,6 +169,7 @@ const controllers = {
       return next(new createError(500, 'Looks like server having trouble'))
     });
   },
+  
   search: async(req, res, next) => {
     const { searchby, searchValue } = req.query
     FlightRoute.findAll(
@@ -177,10 +178,16 @@ const controllers = {
           [searchby]: {
             [Op.like]: `${searchValue}%`
           }
-        }
+        },
+        include: [
+          {
+            model: AirLines
+          }
+        ]
       } 
     )
       .then((result) => {
+        console.log('result search', result)
         response(res, result, { status: 'success', statusCode:200 }, null) 
       }).catch(() => {
         return next(new createError(500, `Looks like server having trouble`))
